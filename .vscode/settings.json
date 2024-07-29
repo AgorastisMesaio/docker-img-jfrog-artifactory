@@ -1,0 +1,17 @@
+// My VSCode settings
+{
+    // General
+    "editor.wordWrap": "on",
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.associations": {
+        "*.json": "jsonc"
+    },
+
+    // Name: Trailing Spaces
+    // Id: shardulm94.trailing-spaces
+    // Description: Highlight trailing spaces and delete them in a flash!
+    // VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=shardulm94.trailing-spaces
+    "trailing-spaces.trimOnSave": true,
+}

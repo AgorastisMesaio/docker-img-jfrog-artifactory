@@ -1,0 +1,37 @@
+## @formatter:off
+## JFROG ARTIFACTORY SYSTEM CONFIGURATION FILE
+##
+## We are lowering the log level from info to warning, to
+## reduce the verbosity of artifactory
+##
+configVersion: 1
+
+frontend:
+  logging:
+    application:
+      level: warn
+
+metadata:
+  logging:
+    application:
+      level: warn
+router:
+  logging:
+    application:
+      level: warn
+event:
+  logging:
+    application:
+      level: warn
+
+observability:
+  logging:
+    application:
+      level: warn
+  consumption:
+    allow: ""
+
+shared:
+    logging:
+        consoleLog:
+            enabled: false

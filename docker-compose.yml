@@ -1,0 +1,74 @@
+### Docker Compose example
+
+volumes:
+  # Artifactory
+  postgres_data:
+    driver: local
+  artifactory_data:
+    driver: local
+
+networks:
+  my_network:
+    name: my_network
+    driver: bridge
+
+services:
+  ct_postgres:
+    image: ghcr.io/sw-luis-palacios/base-postgres:main
+    hostname: postgres
+    container_name: ct_postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=artifactory
+      - POSTGRES_USER=artifactory
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "10"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+    networks:
+      - my_network
+
+  ct_artifactory:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/sw-luis-palacios/base-artifactory:main
+    hostname: artifactory
+    container_name: ct_artifactory
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+    environment:
+      #- ARTIFACTORY_LOG_LEVEL=warn
+      - ENABLE_MIGRATION=y
+      - JF_SHARED_DATABASE_TYPE=postgresql
+      - JF_SHARED_DATABASE_USERNAME=artifactory
+      - JF_SHARED_DATABASE_PASSWORD=password
+      - JF_SHARED_DATABASE_URL=jdbc:postgresql://ct_postgres:5432/artifactory
+      - JF_SHARED_DATABASE_DRIVER=org.postgresql.Driver
+      - JF_SHARED_NODE_IP=artifactory
+      - JF_SHARED_NODE_ID=myid
+      - JF_SHARED_NODE_NAME=myname
+      - JF_ROUTER_ENTRYPOINTS_EXTERNALPORT=8082
+    ports:
+      - '8082:8082' # Management console port
+    volumes:
+      - ./config:/config
+      - artifactory_data:/var/opt/jfrog/artifactory
+      - ./token:/var/opt/jfrog/artifactory/token
+    networks:
+      - my_network
+    depends_on:
+      - ct_postgres

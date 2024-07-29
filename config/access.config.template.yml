@@ -1,0 +1,14 @@
+# In orther to generate an admin-scoped token during our first run we need
+# to place a `generate.token.json` file under the `/var/bootstrap/etc/access/keys`
+# directory.
+#
+# When bootstrapping, if this file exists, will generate a token and place it in
+# the file `/var/etc/access/keys/token.json`
+#
+# This `token.json` will be deleted after one minute, but we can change this time
+# period to a maximum of 15 minutes, creating the file:
+#
+# /var/etc/access/access.config.template.yml with the following entry:
+#
+security:
+  bootstrap-token-delete-in-minutes: 15
