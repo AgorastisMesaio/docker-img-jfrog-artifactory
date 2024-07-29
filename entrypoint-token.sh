@@ -190,20 +190,33 @@ create_permanent_token() {
 # We will execute our code ONLY IF IT'S MY FIRST RUN IN THIS CONTAINER
 #
 # If you need to check the log:
-# docker exec -u 0 -it ct_artifactory /bin/bash
-# tail -f entrypoint-firstrun.log
+#   docker exec -u 0 -it ct_artifactory /bin/bash
+#   tail -f entrypoint-firstrun.log
 #
-# Check if we have some files
-if [ -f ${CONFIG_ROOT}/access.config.template.yml ]; then
+# Our first time?
+if [ ! -f "$IWASHERE" ] ||  [ -z "${PERMANENT_ADMIN_TOKEN}" ]; then
 
   # IMPORTANT: Our workdir should be /opt/jfrog/artifactory/var
   #
   cd /opt/jfrog/artifactory/var
 
+  # Copy custome files if any
+  if [ -f ${CONFIG_ROOT}/system.yaml ]; then
+    cp ${CONFIG_ROOT}/system.yaml /opt/jfrog/artifactory/var/etc
+  fi
+  if [ -f ${CONFIG_ROOT}/logback.xml ]; then
+    cp ${CONFIG_ROOT}/logback.xml /opt/jfrog/artifactory/var/etc/artifactory
+  fi
+  if [ -f ${CONFIG_ROOT}/artifactory.repository.config.json ]; then
+    cp ${CONFIG_ROOT}/artifactory.repository.config.json  /opt/jfrog/artifactory/var/etc/artifactory/artifactory.repository.config.import.json
+  fi
+  if [ -f ${CONFIG_ROOT}/access.config.template.yml ]; then
+    cp ${CONFIG_ROOT}/access.config.template.yml /opt/jfrog/artifactory/var/etc/access/access.config.import.yml
+  fi
+
   # Set the correct working directory
   mkdir -p token
   chown 1030:1030 token
-
 
   # Check if it's my first run
   if [ ! -f "$IWASHERE" ] ||  [ -z "${PERMANENT_ADMIN_TOKEN}" ]; then
