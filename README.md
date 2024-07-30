@@ -3,6 +3,7 @@
 ![GitHub action workflow status](https://github.com/SW-Luis-Palacios/base-artifactory/actions/workflows/docker-publish.yml/badge.svg)
 
 This repository contains a `Dockerfile` aimed to create a *base image* to provide a JFrog Artifactory OSS container. JFrog Artifactory OSS (Open Source Software) is a binary repository manager that provides a robust and scalable solution for managing binary artifacts throughout the application development lifecycle. It serves as a single source of truth for all binary artifacts, enabling efficient management, storage, and retrieval.
+.
 
 This image implements the ability to:
 
