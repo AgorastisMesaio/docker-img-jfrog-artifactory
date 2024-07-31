@@ -55,7 +55,7 @@ networks:
 
 services:
   ct_postgres:
-    image: ghcr.io/agorastismesaio/base-postgres:main
+    image: ghcr.io/agorastismesaio/docker-img-postgres:main
     hostname: postgres
     container_name: ct_postgres
     restart: always

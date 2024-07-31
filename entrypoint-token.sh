@@ -15,7 +15,7 @@
 #     driver: local
 # :
 # artifactory:
-#    image: ghcr.io/agorastismesaio/base- artifactory:main
+#    image: ghcr.io/agorastismesaio/docker-img-jfrog-artifactory:main
 #    :
 #    volumes:
 #      - artifactory_data:/var/opt/jfrog/artifactory
