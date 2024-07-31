@@ -1,6 +1,6 @@
 # JFrog Artifactory OSS Container
 
-![GitHub action workflow status](https://github.com/AgorastisMesaio/docker-img-artifactory/actions/workflows/docker-publish.yml/badge.svg)
+![GitHub action workflow status](https://github.com/AgorastisMesaio/docker-img-jfrog-artifactory/actions/workflows/docker-publish.yml/badge.svg)
 
 This repository contains a `Dockerfile` aimed to create a *base image* to provide a JFrog Artifactory OSS container. JFrog Artifactory OSS (Open Source Software) is a binary repository manager that provides a robust and scalable solution for managing binary artifacts throughout the application development lifecycle. It serves as a single source of truth for all binary artifacts, enabling efficient management, storage, and retrieval.
 .
