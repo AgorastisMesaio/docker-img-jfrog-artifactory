@@ -1,6 +1,6 @@
 # JFrog Artifactory OSS Container
 
-![GitHub action workflow status](https://github.com/SW-Luis-Palacios/base-artifactory/actions/workflows/docker-publish.yml/badge.svg)
+![GitHub action workflow status](https://github.com/AgorastisMesaio/docker-img-artifactory/actions/workflows/docker-publish.yml/badge.svg)
 
 This repository contains a `Dockerfile` aimed to create a *base image* to provide a JFrog Artifactory OSS container. JFrog Artifactory OSS (Open Source Software) is a binary repository manager that provides a robust and scalable solution for managing binary artifacts throughout the application development lifecycle. It serves as a single source of truth for all binary artifacts, enabling efficient management, storage, and retrieval.
 .
@@ -55,7 +55,7 @@ networks:
 
 services:
   ct_postgres:
-    image: ghcr.io/sw-luis-palacios/base-postgres:main
+    image: ghcr.io/agorastismesaio/base-postgres:main
     hostname: postgres
     container_name: ct_postgres
     restart: always
@@ -82,7 +82,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/sw-luis-palacios/base-artifactory:main
+    image: ghcr.io/agorastismesaio/docker-img-artifactory:main
     hostname: artifactory
     container_name: ct_artifactory
     restart: always
@@ -132,7 +132,7 @@ If you copy or fork this project to create their own base image, instead of cons
 To build the Docker image, run the following command in the directory containing the Dockerfile:
 
 ```sh
-docker build -t sw-luis-palacios/base-artifactory:main .
+docker build -t agorastismesaio/docker-img-artifactory:main .
 or
 docker compose up --build -d
 ```
@@ -140,5 +140,5 @@ docker compose up --build -d
 ### Troubleshoot
 
 ```sh
-docker run --rm -it --entrypoint /bin/bash --name artifactory --hostname artifactory sw-luis-palacios/base-artifactory:main
+docker run --rm -it --entrypoint /bin/bash --name artifactory --hostname artifactory agorastismesaio/docker-img-artifactory:main
 ```

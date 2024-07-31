@@ -14,7 +14,7 @@ networks:
 
 services:
   ct_postgres:
-    image: ghcr.io/sw-luis-palacios/base-postgres:main
+    image: ghcr.io/agorastismesaio/base-postgres:main
     hostname: postgres
     container_name: ct_postgres
     restart: always
@@ -41,7 +41,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/sw-luis-palacios/base-artifactory:main
+    image: ghcr.io/agorastismesaio/docker-img-artifactory:main
     hostname: artifactory
     container_name: ct_artifactory
     restart: always

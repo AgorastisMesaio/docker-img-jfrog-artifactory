@@ -15,7 +15,7 @@
 #     driver: local
 # :
 # artifactory:
-#    image: ghcr.io/sw-luis-palacios/base- artifactory:main
+#    image: ghcr.io/agorastismesaio/base- artifactory:main
 #    :
 #    volumes:
 #      - artifactory_data:/var/opt/jfrog/artifactory
