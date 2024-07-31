@@ -12,7 +12,7 @@
 #
 FROM releases-docker.jfrog.io/jfrog/artifactory-oss:latest
 
-LABEL org.opencontainers.image.authors="Luis Palacios"
+LABEL org.opencontainers.image.authors="Agorastis Mesaio"
 
 # Copy entrypoint scripts
 COPY --chown=1030:1030 --chmod=755 ./entrypoint.sh /entrypoint.sh
