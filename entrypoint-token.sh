@@ -276,7 +276,7 @@ EOF
           # While we are here, it's a good opportunity to set the Admin
           # password. Let's try...
           if [ ! -z ${ADMIN_PASSWORD} ]; then
-              curl -X POST -u admin:password -H "Content-type: application/json" -d "{ \"userName\" : \"admin\", \"oldPassword\" : \"password\", \"newPassword1\" : \"${ADMIN_PASSWORD}\", \"newPassword2\" : \"${ADMIN_PASSWORD}\" }" http://127.0.0.1:8082/artifactory/api/security/users/authorization/changePassword
+              curl -s -X POST -u admin:password -H "Content-type: application/json" -d "{ \"userName\" : \"admin\", \"oldPassword\" : \"password\", \"newPassword1\" : \"${ADMIN_PASSWORD}\", \"newPassword2\" : \"${ADMIN_PASSWORD}\" }" http://127.0.0.1:8082/artifactory/api/security/users/authorization/changePassword
           fi
       fi
 
