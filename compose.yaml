@@ -52,6 +52,7 @@ services:
         hard: 40000
     environment:
       #- ARTIFACTORY_LOG_LEVEL=warn
+      - ADMIN_PASSWORD="SuperPassword123."
       - ENABLE_MIGRATION=y
       - JF_SHARED_DATABASE_TYPE=postgresql
       - JF_SHARED_DATABASE_USERNAME=artifactory

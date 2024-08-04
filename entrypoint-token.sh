@@ -4,7 +4,10 @@
 #
 # The objective of this script is to create a PERMANENT_ADMIN_TOKEN
 # during the first deployment/build of the image. It will be created
-# under the persistance volume and your host's ./token directory:
+# under the persistance volume and your host's ./token directory.
+#
+# Also, if env variable ADMIN_PASSWORD has been set, change the
+# default admin password
 #
 # For this to happen, you need to setup the followin volumes (example)
 # in your docker-compose.yml file:
@@ -269,6 +272,12 @@ set ARTIFACTORY_ADMIN_SCOPED_TOKEN=$reference_token
 EOF
           # Make sure permissions are all set correct
           chown -R 1030:1030 token
+
+          # While we are here, it's a good opportunity to set the Admin
+          # password. Let's try...
+          if [ ! -z ${ADMIN_PASSWORD} ]; then
+              curl -X POST -u admin:password -H "Content-type: application/json" -d "{ \"userName\" : \"admin\", \"oldPassword\" : \"password\", \"newPassword1\" : \"${ADMIN_PASSWORD}\", \"newPassword2\" : \"${ADMIN_PASSWORD}\" }" http://127.0.0.1:8082/artifactory/api/security/users/authorization/changePassword
+          fi
       fi
 
   else
