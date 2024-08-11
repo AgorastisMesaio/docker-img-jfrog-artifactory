@@ -282,7 +282,7 @@ EOF
 
   else
       log_message "File $IWASHERE already exists, not executing token creation."
-      log_message "The permanent token should already be in the container".
+      log_message "The permanent token should already be in the container."
   fi
 
 fi
