@@ -41,7 +41,7 @@ RUN chmod +x /healthcheck.sh
 # --timeout=10s: Wait 'timeout' for the health check to succeed.
 # --start-period=3s: Wait time before first check. Gives the container some time to start up.
 # --retries=3: Retry check 'retries' times before considering the container as unhealthy.
-HEALTHCHECK --interval=30s --timeout=10s --start-period=3s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=10 \
   CMD /healthcheck.sh || exit $?
 
 # Go for it...
