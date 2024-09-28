@@ -82,7 +82,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/agorastismesaio/docker-img-artifactory:main
+    image: ghcr.io/agorastismesaio/docker-img-jfrog-artifactory:main
     hostname: artifactory
     container_name: ct_artifactory
     restart: always
@@ -129,10 +129,10 @@ If you copy or fork this project to create their own base image, instead of cons
 
 ### Building the Image
 
-To build the Docker image, run the following command in the directory containing the Dockerfile:
+To build the Docker image for local testing your can run the following command in the directory containing the Dockerfile:
 
 ```sh
-docker build -t agorastismesaio/docker-img-artifactory:main .
+docker build --no-cache -t docker-img-jfrog-artifactory:main .
 or
 docker compose up --build -d
 ```
@@ -140,5 +140,5 @@ docker compose up --build -d
 ### Troubleshoot
 
 ```sh
-docker run --rm -it --entrypoint /bin/bash --name artifactory --hostname artifactory agorastismesaio/docker-img-artifactory:main
+docker run --rm -it --entrypoint /bin/bash --name artifactory --hostname artifactory agorastismesaio/docker-img-jfrog-artifactory:main
 ```
