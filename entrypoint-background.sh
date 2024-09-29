@@ -276,8 +276,17 @@ if [ ! -f "$IWASHERE" ] || [ -z "${PERMANENT_ADMIN_TOKEN}" ]; then
         prepare_files
         log_message "INFO" "File preparation for token creation finished."
 
-        # Wait till Artifactory is up and running (give it 5 minutes)
-        check_artifactory_health 300
+        # Wait till Artifactory is up and running.
+        # This is important because we need to wait for the temporary token
+        # to be available in the internal file system.
+        # We will use this token to create the permanent token.
+        #
+        # In very slow systems, it may take a while to boot,
+        # in particular seen such delays in Windows Docker Desktop, or
+        # CI/CD pipeline, and in some cloud providers
+        #
+        # so we give it 10 minutes to boot
+        check_artifactory_health 600
         log_message "INFO" "Artifactory health check completed."
 
         # Phase 2: Wait till Temporary Token is available
