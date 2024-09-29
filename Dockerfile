@@ -16,7 +16,8 @@ LABEL org.opencontainers.image.authors="Agorastis Mesaio"
 
 # Copy entrypoint scripts
 COPY --chown=1030:1030 --chmod=755 ./entrypoint.sh /entrypoint.sh
-COPY --chown=1030:1030 --chmod=755 ./entrypoint-token.sh /opt/jfrog/artifactory/var/entrypoint-token.sh
+COPY --chown=1030:1030 --chmod=755 ./entrypoint-background.sh /opt/jfrog/artifactory/var/entrypoint-background.sh
+COPY --chown=1030:1030 --chmod=755 ./test/testChangeAdminPassword.sh /opt/jfrog/artifactory/var/testChangeAdminPassword.sh
 
 # Prepare the image
 COPY --chmod=644 ./config/system.yaml /opt/jfrog/artifactory/var/etc

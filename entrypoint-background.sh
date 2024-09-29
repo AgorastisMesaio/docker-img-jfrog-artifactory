@@ -2,14 +2,13 @@
 #
 # entrypoint-token.sh for JFrog Artifactory OSS
 #
-# The objective of this script is to create a PERMANENT_ADMIN_TOKEN
-# during the first deployment/build of the image. It will be created
-# under the persistance volume and your host's ./token directory.
+# The objective of this script is, during the first deployment,
+# perform the following tasks:
+# - create a permanent token
+#   under persistance volume AND under host's ./token directory
+# - change Admin's password if env variable ADMIN_PASSWORD is set
 #
-# Also, if env variable ADMIN_PASSWORD has been set, change the
-# default admin password
-#
-# For this to happen, you need to setup the followin volumes (example)
+# For this to happen, you need to setup the followin volumes
 # in your docker-compose.yml file:
 #
 # ---
@@ -29,12 +28,17 @@
 # Global Variables
 export CONFIG_ROOT=/config
 CONFIG_ROOT_MOUNT_CHECK=$(mount | grep ${CONFIG_ROOT})
-LOGFILE="./entrypoint-firstrun.log"
-IWASHERE="./entrypoint-firstrun.lock"
+LOGFILE="./firstrun.log"
+IWASHERE="./iwashere.lock"
 export PERMANENT_ADMIN_TOKEN="permanentAdminToken.json"
 export PERMANENT_ADMIN_TOKEN_SCRIPT="permanentAdminToken.sh"
 export PERMANENT_ADMIN_TOKEN_SCRIPT_BAT="permanentAdminToken.BAT"
 temporaryToken=""
+# Working with curl
+change_password_response="/tmp/change_password_response"
+artifactory_health_response="/tmp/artifactory_health_response"
+# Calculate time to fully boot Artifactory
+artifactory_boot_start_time=$(date +%s)
 
 # Function to log messages with date, time, and level
 log_message() {
@@ -75,7 +79,7 @@ EOT
 # Change the admin's password
 change_admin_password_start_time=$(date +%s)
 admin_password_changed=false
-try_to_change_admin_password() {
+changeAdminPassword() {
     ADMIN_PASSWORD_CHANGE_INTERVAL=$1
     current_time=$(date +%s)
     time_elapsed=$(( current_time - change_admin_password_start_time ))
@@ -83,31 +87,20 @@ try_to_change_admin_password() {
     if (( time_elapsed >= ADMIN_PASSWORD_CHANGE_INTERVAL )); then
         change_admin_password_start_time=$(date +%s)
 
+        # Don't want curl's stdout response, just the HTTP status code
         log_message "INFO" "Attempting to set Admin Password"
-        # response=$(curl -w "%{http_code}" -o /tmp/change_password_response -X POST -u admin:password \
-        #     -H "Content-type: application/json" \
-        #     -d "{ \"userName\" : \"admin\", \"oldPassword\" : \"password\", \"newPassword1\" : \"${ADMIN_PASSWORD}\", \"newPassword2\" : \"${ADMIN_PASSWORD}\" }" \
-        #     http://127.0.0.1:8082/artifactory/api/security/users/authorization/changePassword )
-        log_separator
-        curl -X POST -u admin:password \
+        http_code=$(curl -s -w "%{http_code}" -o ${change_password_response} -X POST -u admin:password \
             -H "Content-type: application/json" \
             -d "{ \"userName\" : \"admin\", \"oldPassword\" : \"password\", \"newPassword1\" : \"${ADMIN_PASSWORD}\", \"newPassword2\" : \"${ADMIN_PASSWORD}\" }" \
-            http://127.0.0.1:8082/artifactory/api/security/users/authorization/changePassword >> ${LOGFILE} 2>&1
-
-#        echo $response >> ${LOGFILE}
-        log_separator
-
-        status_code=$(tail -n1 <<<"$response")
-
-        if [ "$status_code" -eq 200 ]; then
-            log_message "INFO" "Admin password changed successfully."
+            http://127.0.0.1:8082/artifactory/api/security/users/authorization/changePassword)
+        if [ "$http_code" -eq 200 ]; then
+            log_message "INFO" "Admin password changed successfully. Http code: $http_code"
             return 0  # Return 0 explicitly to indicate success
         else
-            log_message "ERROR" "Failed to change admin password. Status code: $status_code"
+            log_message "ERROR" "Failed to change admin password. Http code: $http_code"
             return 1  # Return 1 explicitly to indicate failure
         fi
     fi
-
     return 1  # Return 1 if the time interval has not passed
 }
 
@@ -123,18 +116,8 @@ check_artifactory_health() {
 
     while [ $(($(date +%s) - start_time)) -lt $timeout ]; do
 
-        # We'll keep trying to change the admin's password
-        if [ ! -z "${ADMIN_PASSWORD}" ] && [ "${admin_password_changed}" = false ]; then
-            try_to_change_admin_password 15
-            result=$?
-            if [ $result -eq 0 ]; then
-                admin_password_changed=true
-                log_message "INFO" "Admin password successfully changed. Stopping further attempts."
-            fi
-        fi
-
         # Check artifactory health status
-        result=$(curl -s -w "%{http_code}" -o /tmp/artifactory_health_response $url)
+        result=$(curl -s -w "%{http_code}" -o ${artifactory_health_response} $url)
 
         if [ "$result" -ne 200 ]; then
             log_message "WARN" "Artifactory not ready yet (HTTP $result). Retrying..."
@@ -142,7 +125,7 @@ check_artifactory_health() {
             continue
         fi
 
-        health_status=$(cat /tmp/artifactory_health_response)
+        health_status=$(cat ${artifactory_health_response})
 
         # Check if all services have a "message" of "OK"
         all_services_ok=true
@@ -293,8 +276,8 @@ if [ ! -f "$IWASHERE" ] || [ -z "${PERMANENT_ADMIN_TOKEN}" ]; then
         prepare_files
         log_message "INFO" "File preparation for token creation finished."
 
-        # Wait till Artifactory is up and running (give it 120secs)
-        check_artifactory_health 120
+        # Wait till Artifactory is up and running (give it 5 minutes)
+        check_artifactory_health 300
         log_message "INFO" "Artifactory health check completed."
 
         # Phase 2: Wait till Temporary Token is available
@@ -329,7 +312,8 @@ EOF
 
             # Last try to change the admin's password
             if [ ! -z "${ADMIN_PASSWORD}" ] && [ "${admin_password_changed}" = false ]; then
-                try_to_change_admin_password 0
+                sleep 5
+                changeAdminPassword 0
                 result=$?
                 if [ $result -eq 0 ]; then
                     admin_password_changed=true
@@ -348,6 +332,10 @@ EOF
     fi
 
 fi
+
+# Final log show time to fully boot Artifactory
+artifactory_boot_time_elapsed=$(($(date +%s) - artifactory_boot_start_time))
+log_message "INFO" "Artifactory boot time: $artifactory_boot_time_elapsed seconds"
 
 # Run the arguments from CMD in the Dockerfile
 # In our case we are starting nginx by default
